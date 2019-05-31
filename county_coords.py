@@ -36,24 +36,38 @@ def readFile(filename):
 def processData(fileData):
     currentState = ""
     data = {}
+    # count = 0
 
     for line in fileData:
+        # if count == 200:
+        #     break
+
         splitLine = line.split(",")
 
         county = splitLine[0]
         stateCode = splitLine[3]
+
+        # print("dataLength="+str(len(data)))
+        # print("count="+county)
+        # print("currentState="+currentState)
+        # print("stateCode=",stateCode)
+        # print()
+    
         if currentState == "":
             currentState = stateCode
         elif stateCode != currentState and currentState != "":
             ## write dataset to csv file for that state, then switch to next state
-            writeFile = open("./output/stateCountyCoords/"+stateCode+".csv", "w")
-            for county in data:
-                writeFile.write(county+','+data[county]+'\n')
+            writeFile = open("./output/stateCountyCoords/"+currentState+".csv", "w")
+            writeFile.write("County,Coordinates"+'\n')
+            for item in data:
+                writeFile.write(item+','+data[item]+'\n')
             data = {}
             writeFile.close()
+            currentState = stateCode
         coords = getCoords(line)
 
         data[county] = coords
+        # count += 1
 
         # print(splitLine)
         # print()
