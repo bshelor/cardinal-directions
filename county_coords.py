@@ -66,4 +66,4 @@ def processData(fileData):
 def main(): 
     readFile("United States Counties")
 
-main()
+# main()
