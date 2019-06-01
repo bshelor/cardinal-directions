@@ -1,4 +1,58 @@
 import sys
+ 
+def stripCountyName(str):
+    for i in range(len(str)):
+        if str[i] == ',':
+            return str[(i+1):]
+ 
+def getCounty(lst):
+    county = ""
+    for string in lst:
+        for char in string:
+            if char != ',':
+                county += char
+            else:
+                return county
+        county += " "
+
+def stripElementTags(str):
+    if '<' in str:
+        for pos in range(len(str)):
+            if str[pos] == '<':
+                for pos2 in range(pos+1,len(str)-1,1):
+                    if str[pos2] == '-':
+                        return str[:pos]+str[pos2:]
+    else:
+        return str
+
+def dictifyLongLats(filename):
+    file = open("./input/stateCountyCoords/"+filename+".csv", "r")
+
+    first_line = file.readline()
+    allCounties = file.readlines()
+
+    countyDict = {}
+
+    for countyData in allCounties:
+        coords = countyData.split(' ')
+        county = getCounty(coords)
+        countySplit = county.split(' ')
+        coords = coords[(len(countySplit)-1):]
+        coords[0] = stripCountyName(coords[0])
+
+        countyDict[county] = {}
+        countyDict[county]['long'] = []
+        countyDict[county]['lat'] = []
+
+        for coord in coords:
+            if coord != None:
+                coord = coord.strip('\n')
+                coord = coord.split(',')
+
+                if len(coord) == 2:
+                    countyDict[county]['long'].append(coord[0])
+                    countyDict[county]['lat'].append(coord[1])
+    return countyDict
 
 def read_file_commas(filename):
     file = open(filename+".csv", 'r')
@@ -8,9 +62,11 @@ def read_file_commas(filename):
     county_dict = {}
 
     for line in all_lines:
+        print(line)
         split_line = line.split(',')
         # split_line = split_line.split(' ')
         print(split_line)
+        # break
         new_line = []
 
         ## for sam specifically
@@ -53,6 +109,8 @@ def read_file_commas(filename):
     # print(county_dict)
     return county_dict
 
+read_file_commas("./input/class/Louisiana Parish - Coordinates")
+
 def read_file_spaces(filename):
     file = open(filename+".csv", 'r')
     first_line = file.readline()
@@ -63,6 +121,7 @@ def read_file_spaces(filename):
     for line in all_lines:
         split_line = line.split(',')
         # print(split_line)
+        # break
 
         key = ""
         for item in range(len(split_line)):
@@ -117,16 +176,12 @@ def calcCardDirections(data):
 
         max_long = 100.0
         min_long = -100.0
-        # print(data[county]['long'])
         for coord in data[county]['long']:
             new_coord = float(coord)
-            # print(new_coord)
             if (new_coord > min_long):
                 min_long = new_coord
             if (new_coord < max_long):
                 max_long = new_coord
-            # print("max_long", max_long)
-            # print("min_long", min_long)
 
         final_result[county]["West"] = max_long
         final_result[county]["East"] = min_long
@@ -147,7 +202,6 @@ def calcCardDirections(data):
 
 def write_csv(data, filename):
     file = open(filename+".csv", "w")
-
     file.write("County, North, East, South, West\n")
     for county in data:
         file.write(county+','+str(data[county]['North'])+','+
@@ -157,13 +211,17 @@ def write_csv(data, filename):
 
 def write_txt(data, filename):
     file = open(filename+".txt", "w")
-
     file.write("County, North, East, South, West\n")
     for county in data:
         file.write(county + ':' + str(data[county]['North']) + ',' +
                    str(data[county]['East']) + ','
                    + str(data[county]['South']) + ','
                    + str(data[county]['West']) + '\n')
+
+def processState(filename):
+    dict = dictifyLongLats(filename)
+    dict = calcCardDirections(dict)
+    write_txt(dict, "./output/stateCardCoords/"+filename+"_cardDirs")
 
 def main():
     print(sys.argv)
@@ -202,4 +260,4 @@ def main():
         data = calcCardDirections(counties)
         write_txt(data, output_file)
 
-main()
+# main()
