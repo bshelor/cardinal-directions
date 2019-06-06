@@ -1,4 +1,4 @@
-# cardinal-directions
+# cardinal-directions (Old info.  Will be updated soon)
 
 This program will take in a CSV or Excel file of geographical coordinates and return the four cardinal directions from each row of data.
 
